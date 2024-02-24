@@ -42,30 +42,26 @@ ans = 0
 #         produce[logs[k][1]] += logs[k][2]
         
 #     print(i, produce)
-
-best = 7
-label = {
-    'Bessie': 1,
-    'Elsie': 2,
-    'Mildred': 4
-}
 for i in range(len(logs)):
     produce[logs[i][1]] += logs[i][2]
-
-    max_v = max(produce.values())
-    cur_v = 0
-    for name in produce:
-        if produce[name] == max_v:
-            cur_v += label[name]
-    if best != cur_v:
-    
+#     print(produce)
+    cur_best = produce['Bessie']
+    cur_best_name = ['Bessie']
+    for name in ['Elsie', 'Mildred']:
+        if produce[name] > cur_best:
+            cur_best_name = [name]
+            cur_best = produce[name]
+        elif produce[name] == cur_best:
+            cur_best_name.append(name)
+    if tuple(cur_best_name) != best:
         ans += 1
-        best = cur_v
-#        print(best)
+        best = tuple(cur_best_name)
+#         print(best)
 #     i = j
 
 # print(ans)
-# 对了一下页面样式
+# 对了一下样式需求和排期。
+# 有一个输出结果为空的问题，业务目前来用默认话术兜底。
 
 fout.write(f"{ans}\n")
 

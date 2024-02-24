@@ -16,12 +16,21 @@ fout = open(f'{task_name}.out', 'w')
 S = fin.readline().strip()
 T = fin.readline().strip()
 
-while True:
-    idx = S.find(T)
-    if idx >= 0:
-        S = S[:idx] + S[idx + len(T):]
-    else:
-        break
-fout.write(f"{S}\n")
+ans = ""
+
+for i in range(len(S)):
+    ans += S[i]
+    if len(ans) >= len(T) and ans.endswith(T):
+        ans = ans[:-len(T)]
+#     print(ans)
+fout.write(ans + "\n")
+
+# while True:
+#     idx = S.find(T)
+#     if idx >= 0:
+#         S = S[:idx] + S[idx + len(T):]
+#     else:
+#         break
+# fout.write(f"{S}\n")
 
 fout.close()
