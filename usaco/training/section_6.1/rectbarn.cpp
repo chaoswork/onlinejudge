@@ -91,14 +91,19 @@ int main() {
                 idx = st.top().first;
                 h = st.top().second;
                 st.pop();
-                int area = (j - idx) * h;
+                int w = 0;
+                if (st.empty()) {w = j - 1;} else{w = j - st.top().first - 1;}
+                //                int area = (j - idx) * h;
+                int area = w * h;
                 best = max(best, area);
             }
+            /*
             if (idx == -1) {
                 st.push({j, height[i % 2][j]});
             } else {
                 st.push({idx, height[i % 2][j]});
-            }
+            }*/
+            st.push({j, height[i % 2][j]});
         }
     }
 
