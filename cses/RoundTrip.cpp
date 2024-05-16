@@ -48,26 +48,72 @@ typedef vector<double> VD;
 typedef long long LL;
 typedef pair<int, int> PII;
 
+bool found = false;
+int start = -1;
+VI ans;
+VI tried;
+
+void dfs(int cur, int pre, const VVI& adj, VI &vis, VI &next){
+  /*  cout << "debug " << cur << " " << pre << " " << next[pre] << endl;
+  FOR(i, 1, 5) {
+      cout << next[i] << " ";
+  }
+  cout << endl;
+*/
+  if (found) return;
+  if (vis[cur]) {
+    found = true;
+    ans.PB(cur);
+    int p = next[cur];
+    while (p != cur) {
+      ans.PB(p);
+      p = next[p];
+    }
+    ans.PB(cur);
+    return;
+  }
+  tried[cur] = 1;
+
+
+  vis[cur] = true;
+  REP(i, SIZE(adj[cur])){
+    int j = adj[cur][i];
+    if (pre != j && SIZE(adj[j]) >= 2){
+      next[cur] = j;
+      dfs(j, cur, adj, vis, next);
+    }
+  }
+
+  vis[cur] = false;
+}
 
 
 int main(){
-  int n, x;
-  cin >> n;
-  VI nums;
-  REP(i, n){
-    cin >> x;
-    nums.PB(x);
+  int n, m, a, b;
+  cin >> n >> m;
+  VVI adj(n + 1, VI());
+  VI vis(n + 1, 0);
+  VI next(n + 1, 0);
+  REP(i, n + 1) tried.PB(0);
+
+  REP(k, m){
+    cin >> a >> b;
+    adj[a].PB(b);
+    adj[b].PB(a);
   }
-  sort(ALL(nums));
-  LL largest = 0;
-  REP(i, n){
-    if (largest + 1 >= nums[i]){
-      largest += nums[i];
-    } else {
-      break;
+  FOR(i, 1, n){
+    if (SIZE(adj[i]) < 2 || tried[i]) continue;
+    dfs(i, 0, adj, vis, next);
+  }
+  if (found) {
+    cout << SIZE(ans) << endl;
+    REP(i, SIZE(ans)){
+      if (i) cout << " ";
+      cout << ans[i];
     }
+    cout << endl;
+  } else {
+    cout << "IMPOSSIBLE" << endl;
   }
-  cout << largest + 1 << endl;
-  
   return 0;
 }
