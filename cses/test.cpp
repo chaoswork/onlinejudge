@@ -84,13 +84,18 @@ void solve() {
                              
 signed main() { 
     ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
-    #ifdef Dodi
-        freopen("in.txt","r",stdin);
-        freopen("out.txt","w",stdout);
-    #endif
-    int t = 1;
-    //cin >> t; 
-    while (t --> 0) solve();
+    multimap<int, int> m;
+    FOR(i, 1, 9){
+      m.insert(MP(i,i));
+    }
+    REP(i, 5) m.insert(MP(4, 100 + i + 1));
+
+    auto it1 = m.lower_bound(4);
+    cout << it1->first << " " << it1->second << endl;
+
+    auto it2 = m.upper_bound(4);
+    cout << it2->first << " " << it2->second << endl;
+    return 0;
 }
 /*
 VI pi(string s) {

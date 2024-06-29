@@ -52,10 +52,10 @@ VI nums;
 
 typedef struct node{
 
-  node(int s, int e):start(s), end(e), left(0), right(0){}
+  node(int s, int e):start(s), end(e), updates(0), left(0), right(0){}
   int start;
   int end;
-  VI updates;
+  LL updates;
   node *left;
   node *right;
 } node;
@@ -75,7 +75,7 @@ node * build_tree(int start, int end){
 
 void update(node *root, int start, int end, int value){
   if (root->start == start && root->end == end){
-    root->updates.PB(value);
+    root->updates += value;
     return;
   }
   if (end <= root->left->end){
@@ -91,7 +91,8 @@ void update(node *root, int start, int end, int value){
 
 LL query(node *root, int k){
   LL cur = 0;
-  REP(i, SIZE(root->updates)) cur += root->updates[i];
+  // REP(i, SIZE(root->updates)) cur += root->updates[i];
+  cur = root->updates;
   if (k == root->start && k == root->end) return cur;
   
   if (k <= root->left->end){
