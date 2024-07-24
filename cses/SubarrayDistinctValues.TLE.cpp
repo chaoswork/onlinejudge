@@ -50,13 +50,13 @@ typedef long long LL;
 typedef pair<int, int> PII;
 
 
-LL count(int start, int next_pos, int max_pos){
+LL count(int start, map<int, int> pos_map){
   // LL res = 0;
   // int min_pos = pos_map.begin()->first;
   // int del_num = pos_map.begin()->second;
-  // int max_pos = pos_map.rbegin()->first;
+  int max_pos = pos_map.rbegin()->first;
   // int next_pos = (++pos_map.begin())->first;
-  // int next_pos = pos_map.begin()->first + 1;
+  int next_pos = pos_map.begin()->first + 1;
 
   LL k = next_pos - start;
   LL n = max_pos - start + 1;
@@ -82,46 +82,45 @@ int main(){
     return 0;
   }
   VI nums;
-  unordered_map<int, int> nums_cnt; // 数字存放的最后一个数字。
-  nums_cnt.reserve(1024);
-  nums_cnt.max_load_factor(0.25);
+  unordered_map<int, int> last_pos; // 数字存放的最后一个数字。
+  last_pos.reserve(1024);
+  last_pos.max_load_factor(0.25);
 
+  map<int, int> pos_map; // 第i个位置存的数字。
   int start = 0;
   REP(i, n){
     cin >> x;
     nums.PB(x);
   }
   LL res = 0;
-
   REP(i, n){
-    if (nums_cnt.find(nums[i]) == nums_cnt.end()){
-      if (SIZE(nums_cnt) == k) {
+    if (last_pos.find(nums[i]) == last_pos.end()){
+      if (SIZE(last_pos) == k) {
         // delete smallest pos
         // change p
-        int next_pos = start;
-        while (SIZE(nums_cnt) == k){
-          nums_cnt[nums[next_pos]]--;
-          if (nums_cnt[nums[next_pos]] == 0) nums_cnt.erase(nums[next_pos]);
-          next_pos++;
-        }
-
-        res += count(start, next_pos, i - 1);
+        int del_num = pos_map.begin()->second;
+        res += count(start, pos_map);
         // start = (++pos_map.begin())->first;
-        start = next_pos;
-        nums_cnt[nums[i]] = 1;
+        start = pos_map.begin()->first + 1;
+
+        pos_map.erase(pos_map.begin());
+        last_pos.erase(del_num);
+        last_pos[nums[i]] = i;
+        pos_map[i] = nums[i];
+        
         
       } else {
-        nums_cnt[nums[i]] = 1;
-
+        last_pos[nums[i]] = i;
+        pos_map[i] = nums[i];
       }
       
     } else {
-
-      nums_cnt[nums[i]]++;
-
+      pos_map.erase(last_pos[nums[i]]);      
+      last_pos[nums[i]] = i; // update pos
+      pos_map[i] = nums[i];
     }
   }
-  LL nn = n - 1 - start + 1;
+  LL nn = pos_map.rbegin()->first - start + 1;
   res += nn * (nn + 1) / 2;//count(start, pos_map);
 
   cout << res << endl;

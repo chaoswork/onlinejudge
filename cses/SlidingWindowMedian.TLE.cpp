@@ -48,39 +48,61 @@ typedef vector<double> VD;
 typedef long long LL;
 typedef pair<int, int> PII;
 
-LL exp(LL a, LL b, LL mod_num){
-  if (a == 1 || b == 0){
-    return 1;
+int find_kth(multiset<int> S, int k){
+  int L = *S.begin() - 1;
+  int R = *S.rbegin() + 1;
+  if (L == R){
+    return L;
+  } else if (L + 1 == R){
+    if (distance(S.begin(), S.lower_bound(R)) <= k) return R;
+    else return L;
   }
-  if (a == 0) {return 0;}
-  unsigned long long base = a;
-  unsigned long long ans = 1;
-  while (b) {
-
-    if (b % 2){
-      ans = (ans * base) % mod_num;
+  int ans = -1;
+  while (L + 1 < R){
+    int mid = L + (R - L) / 2;
+    // cout << L << " " << R << " mid=" << mid << endl;
+    auto it = S.lower_bound(mid);
+    auto it2 = S.upper_bound(mid);
+    int k1 = distance(S.begin(), it);
+    int k2 = distance(S.begin(), it2);
+    // cout <<k << " " << *it << " " << distance(S.begin(), it) << endl;
+    if (k1 <= k && k2 > k){
+      return *it;
+    } else if (k1 > k) {
+      R = mid;
+    } else { // k2 <= k
+      L = mid;
     }
-    base *= base;
-    base = base % mod_num; // mod need here
-    b >>= 1;
   }
   return ans;
-
 }
 
-
 int main(){
-  //     # f(a, b, c) = f(a, b, c - 1) ^ b = f(a, b, c - 2) ^ b ^ b = f(a, b, 1) ^ b1 ^ b2 ... ^ b_c-1,
-  LL n;
-  LL mod = 1000000007;
-  cin >> n;
-  while (n--){
-    LL a, b, c;
-    cin >> a >> b >> c;
-    LL bc = exp(b, c, mod - 1);
-    LL ans = exp(a, bc, mod);
-    cout << ans << endl;
+  int n, k, x;
+  cin >> n >> k;
+  // multiset<int> ss;
+  // ss.insert(1); ss.insert(1); ss.insert(2);
+  // cout << find_kth(ss, 1) << endl;
+  multiset<int> S;
+  VI nums;
+  REP(i, n){
+    cin >> x;
+    nums.PB(x);
+    if (SIZE(S) < k) S.insert(x);
+    else {
+      if (x != nums[i - k]){
+        S.insert(x);
+        auto it = S.find(nums[i - k]);
+        S.erase(it);
+      }
+    }
+    
+    if (SIZE(S) == k){
+      if (i > k - 1) cout << " ";
+      cout << find_kth(S, (k - 1) / 2);
+    }
+
+    // cout << *S.begin() << " " << *S.rbegin() << endl;
   }
-  
   return 0;
 }

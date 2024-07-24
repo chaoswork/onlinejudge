@@ -48,39 +48,56 @@ typedef vector<double> VD;
 typedef long long LL;
 typedef pair<int, int> PII;
 
-const int MAXN=10000;
-int color[MAXN][MAXN];
-int dx[8] = {1, 1, -1, -1, 2, 2, -2, -2};
-int dy[8] = {2, -2, 2, -2, 1, -1, 1, -1};
-  
-
-
 int main(){
-  int n;
-  cin >> n;
-  FOR(ii, 1, n){
-    LL i = ii;
-    cout << (i * i) * (i * i - 1) / 2 - 4 * (i - 1) * (i - 2) << endl;
+  //123456789 101112131415
+  // 1-9: 9 x 1
+  // 10-99: 90 x 2
+  // 100 - 999: 900 x 3
+  // 1000 - 9999: 9000 x 4
+  LL q, k;
+  vector<LL> cnts;
+  cin >> q;
+  LL cnt = 0;
+  LL base = 9;
+  FOR(i, 1, 17){
+    cnt += i * base;
+    base *=10;
+    // cout << cnt << " " << cnt - 1e18 << endl;
+    cnts.PB(cnt);
   }
-  /*
-  FOR(k, 1, n){
-    memset(color, 0, sizeof(color));
-    LL ans = 0;
-    REP(i, k) REP(j, k){
-      int cnt = 0;
-      REP(d, 8){
-        int r = i + dx[d];
-        int c = j + dy[d];
-        if (r < k && r >= 0 && c < k && c >= 0) cnt++;
-      }
-      ans += k * k - cnt - 1;
-
+  
+  REP(i, q){
+    cin >> k;
+    if (k < 10){
+      cout << k << endl;
+      continue;
     }
-    cout << ans / 2 << endl;
-
+    auto it = upper_bound(ALL(cnts), k);
+    // cout << *it << endl;
+    it--;
+    // cout << k - *it << " " << distance(cnts.begin(), it) + 2 <<  endl;
+    LL left = k - *it;
+    if (left == 0){
+      cout << 9 << endl;
+      continue;
+    }
+    LL dist = distance(cnts.begin(), it) + 2;
+    LL prefix = 1;
+    REP(k, dist - 1) prefix *= 10;
+    LL target = (left - 1) / dist +  prefix;
+    LL R = (left - 1) % dist;
+    //        cout << left << " " << dist << " " << target << " " << R << endl;
+    LL ans = 0;
+    LL base = 1;
+    REP(k, dist - 1){
+      base *= 10;
+    }
+    while (R-- > -1){
+      ans = target / base;
+      target = target % base;
+      base /= 10;
+    }
+    cout << ans << endl;
   }
-  */
-  // 11 10 10 01 01 00
-  // 00 10 01 10 01 11
   return 0;
 }

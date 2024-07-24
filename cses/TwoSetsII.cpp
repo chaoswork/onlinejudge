@@ -78,6 +78,10 @@ int main(){
     cout << i << " " << ans[i] << endl;
   }
   */
-  cout << ans[target] / 2 << endl;
+  if (ans[target] % 2 == 0){
+    cout << ans[target] / 2 << endl;
+  } else {
+    cout << (ans[target] + 1000000007) / 2 << endl;
+  }
   return 0;
 }

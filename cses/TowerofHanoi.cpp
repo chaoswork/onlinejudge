@@ -48,8 +48,36 @@ typedef vector<double> VD;
 typedef long long LL;
 typedef pair<int, int> PII;
 
+
+// H(n) -> 2 * H(n - 1) + 1
+// H(1) -> 1
+// H(2) -> 3 = 1 + 2 H(1)
+// H(3) -> 7 = 1 + 2 H(2)
+// H(4) -> 15 = 1 + 2 H(3)
+
+int cnt(int n){
+  int ans = 0;
+  REP(i, n){
+    ans = ans * 2 + 1;
+  }
+  return ans;
+}
+
+void move_step(int n, int src, int tgt, int mid){
+  if (n == 1){
+    cout << src << " " << tgt << endl;
+
+    return;
+  }
+  move_step(n - 1, src, mid, tgt);
+  cout << src << " " << tgt << endl;
+  move_step(n - 1, mid, tgt, src);
+}
+
 int main(){
   int n;
   cin >> n;
+  cout << cnt(n) << endl;
+  move_step(n, 1, 3, 2);
   return 0;
 }

@@ -48,39 +48,45 @@ typedef vector<double> VD;
 typedef long long LL;
 typedef pair<int, int> PII;
 
-const int MAXN=10000;
-int color[MAXN][MAXN];
-int dx[8] = {1, 1, -1, -1, 2, 2, -2, -2};
-int dy[8] = {2, -2, 2, -2, 1, -1, 1, -1};
-  
+LL exp(LL a, LL b){
+  if (a == 1 || b == 0){
+    return 1;
+  }
+  if (a == 0) {return 0;}
+  unsigned long long base = a;
+  unsigned long long ans = 1;
+  while (b) {
+
+    if (b % 2){
+      ans = (ans * base) % 1000000007;
+    }
+    base *= base;
+    base = base % 1000000007; // mod need here
+    b >>= 1;
+  }
+  return ans;
+
+}
 
 
 int main(){
-  int n;
+  //     # f(a, b, c) = f(a, b, c - 1) ^ b = f(a, b, c - 2) ^ b ^ b = f(a, b, 1) ^ b1 ^ b2 ... ^ b_c-1,
+  LL n;
   cin >> n;
-  FOR(ii, 1, n){
-    LL i = ii;
-    cout << (i * i) * (i * i - 1) / 2 - 4 * (i - 1) * (i - 2) << endl;
-  }
-  /*
-  FOR(k, 1, n){
-    memset(color, 0, sizeof(color));
-    LL ans = 0;
-    REP(i, k) REP(j, k){
-      int cnt = 0;
-      REP(d, 8){
-        int r = i + dx[d];
-        int c = j + dy[d];
-        if (r < k && r >= 0 && c < k && c >= 0) cnt++;
-      }
-      ans += k * k - cnt - 1;
-
+  while (n--){
+    LL a, b, c;
+    cin >> a >> b >> c;
+    if (c == 0){
+      cout << a % 1000000007 << endl;
+      continue;
     }
-    cout << ans / 2 << endl;
-
+    LL ans = exp(a, b);
+    REP(i, c - 1){
+      ans = exp(ans, b);
+      ans %= 1000000007;
+    }
+    cout << ans << endl;
   }
-  */
-  // 11 10 10 01 01 00
-  // 00 10 01 10 01 11
+  
   return 0;
 }

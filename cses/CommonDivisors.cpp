@@ -49,8 +49,6 @@ typedef long long LL;
 typedef pair<int, int> PII;
 
 
-int n, x;
-VI nums;
 
 int gcd(int a, int b){
   if (a < b) swap(a, b);
@@ -59,15 +57,65 @@ int gcd(int a, int b){
 }
 
 int main(){
+  int n, x;
+  cin >> n;
+  unordered_map<int, int> m;
+  int maxv = 0;
+  REP(i, n){
+    cin >> x;
+    maxv = max(x, maxv);
+    if (m.find(x) == m.end()) m[x] = 0;
+    m[x]++;
+  }
+  FORD(i, maxv, 0){
+    int cur = i;
+    int n = 0;
+    while (cur <= maxv){
+      if (m.find(cur) != m.end()){
+        n += m[cur];
+      }
+      if (n > 1) break;
+      cur += i;
+    }
+    if (n > 1) {
+      cout << i << endl;
+      break;
+    }
+  }
+  return 0;
+}
+
+/* TLE
+int main(){
+
+  int n, x;
+  const int maxn = 1000000;
+  VI divisor(maxn + 1, 0);
+  int maxv = 0;
+
   cin >> n;
   REP(i, n){
     cin >> x;
-    nums.PB(x);
+    maxv = max(x, maxv);
+    FOR(j, 1, int(sqrt(x))){
+      // if (j * j > x) break;
+      if (x % j == 0){
+        int k = x / j;
+        if (j == k) divisor[j]++;
+        else {
+          divisor[j]++;
+          divisor[k]++;
+        }
+      }
+    }
   }
-  int best = 0;
-  REP(i, n) FOR(j, i + 1, n - 1){
-    best = max(gcd(nums[i], nums[j]), best);
+  FORD(i, maxv, 1){
+    if (divisor[i] >= 2){
+      cout << i << endl;
+      break;
+    }
   }
-  cout << best << endl;
+
   return 0;
 }
+*/

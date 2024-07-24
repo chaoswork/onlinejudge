@@ -48,39 +48,21 @@ typedef vector<double> VD;
 typedef long long LL;
 typedef pair<int, int> PII;
 
-const int MAXN=10000;
-int color[MAXN][MAXN];
-int dx[8] = {1, 1, -1, -1, 2, 2, -2, -2};
-int dy[8] = {2, -2, 2, -2, 1, -1, 1, -1};
-  
-
-
 int main(){
-  int n;
+  LL n;
   cin >> n;
-  FOR(ii, 1, n){
-    LL i = ii;
-    cout << (i * i) * (i * i - 1) / 2 - 4 * (i - 1) * (i - 2) << endl;
+  LL ans = 0;
+  LL mid = n / 2;
+  FOR(i, 1, mid){
+    ans += n / i * i;
+    //    cout <<i << " " << ans << endl;
+    ans %= 1000000007;
   }
-  /*
-  FOR(k, 1, n){
-    memset(color, 0, sizeof(color));
-    LL ans = 0;
-    REP(i, k) REP(j, k){
-      int cnt = 0;
-      REP(d, 8){
-        int r = i + dx[d];
-        int c = j + dy[d];
-        if (r < k && r >= 0 && c < k && c >= 0) cnt++;
-      }
-      ans += k * k - cnt - 1;
-
-    }
-    cout << ans / 2 << endl;
-
-  }
-  */
-  // 11 10 10 01 01 00
-  // 00 10 01 10 01 11
+  FOR(i, mid + 1, n){
+    ans += i;
+    //    cout <<i << " " << ans << endl;
+    ans %= 1000000007;
+  }  
+  cout << ans << endl;
   return 0;
 }
