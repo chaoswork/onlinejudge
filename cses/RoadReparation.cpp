@@ -29,10 +29,6 @@ using namespace std;
 
 template<class T> inline void ckmax(T &a,T b){if(b>a) a=b;}
 
-
-#define MIN_HEAP(type1, type2) priority_queue<pair<type1, type2>, vector<pair<type1, type2> >, greater<pair<type1, type2> > >
-#define MAX_HEAP(type) priority_queue<type>
-#define ADJ(type1, type2) vector<pair<type1, type2> > 
 #define MP(A,B) make_pair(A,B)
 #define PB push_back
 #define SIZE(X) ((int)(X.size()))
@@ -59,57 +55,52 @@ typedef pair<int, int> PII;
 
 const int MOD = 1000000007;
 const LL INF = 1LL<<62;  //std::numeric_limits<LL>::max();
-const int MAXN = 2e5 + 64;
 
 
-VVI adj;
-vector<LL> ans;
-vector<int> cnt;
-
-
-void dfs1(int x, int par, int depth){
-  // cout << x << " " << par << " " << depth << endl;
-  cnt[x] = 1;
-  ans[1] += depth;
-  REP(i, SIZE(adj[x])){
-
-    int y = adj[x][i];
-    if (y == par) continue;
-
-    dfs1(y, x, depth + 1);
-    cnt[x] += cnt[y];
-  }
-}
-
-void dfs2(int x, int par, int n){
-
-  REP(i, SIZE(adj[x])){
-    int y = adj[x][i];
-    if (y == par) continue;
-    ans[y] = ans[x] + n - 2 * cnt[y];
-    dfs2(y, x, n);
-  }
-}
 
 int main(){
   optimize;
-  int n, a, b;
-  cin >> n;
-  adj = VVI(n + 1, VI());
-  cnt = VI(n + 1, 0);
-  ans = vector<LL>(n + 1, 0);
-  REP(i, n - 1){
-    cin >> a >> b;
-    adj[a].PB(b);
-    adj[b].PB(a);
+  int n, m, a, b, c;
+  cin >> n >> m;
+  vector<vector<PII> > adj(n + 1, vector<PII>());
+  REP(i, m){
+    cin >> a >> b >> c;
+    adj[a].PB(MP(b, c));
+    adj[b].PB(MP(a, c));
   }
-  dfs1(1, 0, 0);
-  dfs2(1, 0, n);
-  FOR(i, 1, n){
-    if (i > 1) cout << " ";
-    cout << ans[i];
-  }
-  cout << '\n';
+  vector<LL> dist(n + 1, INF);
+  VI vis(n + 1, 0);
+  priority_queue<PII> Q;
+  LL ans = 0;
+  dist[1] = 0;
+  Q.push(MP(0, 1));
 
+  while (SIZE(Q)){
+    int w = -Q.top().first;
+    int cur = Q.top().second;
+    Q.pop();    
+    if (vis[cur]) continue;
+    vis[cur] = 1;
+    ans += w;
+    REP(i, SIZE(adj[cur])){
+      int nxt = adj[cur][i].first;
+      int nw = adj[cur][i].second;
+      if (vis[nxt]) continue;
+      if (dist[nxt] > nw){
+        dist[nxt] = nw;
+        Q.push(MP(-nw, nxt));
+      }
+    }
+  }
+  int imp = 0;
+  FOR(i, 1, n){
+    if (dist[i] == INF) {
+      imp = 1;
+      break;
+    }
+  }
+  if (imp) cout << "IMPOSSIBLE" << endl;
+  else cout << ans << endl;
+  
   return 0;
 }

@@ -29,10 +29,6 @@ using namespace std;
 
 template<class T> inline void ckmax(T &a,T b){if(b>a) a=b;}
 
-
-#define MIN_HEAP(type1, type2) priority_queue<pair<type1, type2>, vector<pair<type1, type2> >, greater<pair<type1, type2> > >
-#define MAX_HEAP(type) priority_queue<type>
-#define ADJ(type1, type2) vector<pair<type1, type2> > 
 #define MP(A,B) make_pair(A,B)
 #define PB push_back
 #define SIZE(X) ((int)(X.size()))
@@ -59,57 +55,90 @@ typedef pair<int, int> PII;
 
 const int MOD = 1000000007;
 const LL INF = 1LL<<62;  //std::numeric_limits<LL>::max();
-const int MAXN = 2e5 + 64;
 
 
-VVI adj;
-vector<LL> ans;
-vector<int> cnt;
+struct SCC{
 
+  int t;
+  VVI adj;
+  VI comp_id;
+  VI comp_seq;
+  VI ts;
+  VI st;
+  int N;
+  int n_comp;
 
-void dfs1(int x, int par, int depth){
-  // cout << x << " " << par << " " << depth << endl;
-  cnt[x] = 1;
-  ans[1] += depth;
-  REP(i, SIZE(adj[x])){
-
-    int y = adj[x][i];
-    if (y == par) continue;
-
-    dfs1(y, x, depth + 1);
-    cnt[x] += cnt[y];
+  void init(int n){
+    adj = VVI(n + 1, VI());
+    comp_id = VI(n + 1, 0);
+    ts = VI(n + 1, 0);
+    st = VI();
+    t = 0;
+    N = n;
+    n_comp = 0;
   }
-}
-
-void dfs2(int x, int par, int n){
-
-  REP(i, SIZE(adj[x])){
-    int y = adj[x][i];
-    if (y == par) continue;
-    ans[y] = ans[x] + n - 2 * cnt[y];
-    dfs2(y, x, n);
+  int dfs(int cur){
+    int low = ts[cur] = ++t;
+    st.PB(cur);
+    for(int j: adj[cur]){
+      if (!comp_id[j]) {
+        low = min(low, ts[j] ?: dfs(j));
+      }
+    }
+    if (low == ts[cur]){
+      comp_seq.PB(cur);
+      ++n_comp;
+      int p = -1;
+      while (p != cur){
+        p = st.back();
+        // comp_id[p] = cur;
+        comp_id[p] = n_comp;        
+        st.pop_back();
+      }
+      
+    }
+    return low;
   }
+  void gen(){
+    FOR(i, 1, N){
+      if (!ts[i]) dfs(i);
+    }
+    reverse(ALL(comp_seq));
+  }
+  
+
+  void add_edge(int a, int b) {adj[a].PB(b);}
+};
+
+
+void dfs(int cur, const VVI &adj, VI &vis){
+  if (vis[cur]) return;
+  vis[cur] = 1;
+  REP(i, SIZE(adj[cur])) dfs(adj[cur][i], adj, vis);
 }
 
 int main(){
   optimize;
-  int n, a, b;
-  cin >> n;
-  adj = VVI(n + 1, VI());
-  cnt = VI(n + 1, 0);
-  ans = vector<LL>(n + 1, 0);
-  REP(i, n - 1){
+  int n, m, a, b;
+  SCC graph;
+  cin >> n >> m;
+  graph.init(n);
+  REP(i, m){
     cin >> a >> b;
-    adj[a].PB(b);
-    adj[b].PB(a);
+    graph.add_edge(a, b);
   }
-  dfs1(1, 0, 0);
-  dfs2(1, 0, n);
+  graph.gen();
+
+  // DISP_VEC(graph.ts);
+  // DISP_VEC(graph.comp_seq);
+  cout << graph.n_comp << endl;
+  // DISP_VEC(graph.comp_id);
   FOR(i, 1, n){
     if (i > 1) cout << " ";
-    cout << ans[i];
+    cout << graph.comp_id[i];
   }
-  cout << '\n';
+  cout << endl;
+  // DISP_VEC(graph.st);
 
   return 0;
 }

@@ -61,55 +61,41 @@ const int MOD = 1000000007;
 const LL INF = 1LL<<62;  //std::numeric_limits<LL>::max();
 const int MAXN = 2e5 + 64;
 
+map<PII, int> ans;
+VI adj;
+VI vis;
 
-VVI adj;
-vector<LL> ans;
-vector<int> cnt;
+int dfs(int x, int y){
+  if (x == y) return 0;
+  if (ans.find(MP(x, y)) != ans.end()) return ans[MP(x, y)];
 
+  
+  vis[x] = 1;
 
-void dfs1(int x, int par, int depth){
-  // cout << x << " " << par << " " << depth << endl;
-  cnt[x] = 1;
-  ans[1] += depth;
-  REP(i, SIZE(adj[x])){
-
-    int y = adj[x][i];
-    if (y == par) continue;
-
-    dfs1(y, x, depth + 1);
-    cnt[x] += cnt[y];
+  if (!vis[adj[x]]){
+    int n = dfs(adj[x], y);
+    if (n != -1){
+      return ans[MP(x, y)] = 1 + n;
+    }
   }
-}
-
-void dfs2(int x, int par, int n){
-
-  REP(i, SIZE(adj[x])){
-    int y = adj[x][i];
-    if (y == par) continue;
-    ans[y] = ans[x] + n - 2 * cnt[y];
-    dfs2(y, x, n);
-  }
+  vis[x] = 0;
+  return ans[MP(x, y)] = -1;
 }
 
 int main(){
   optimize;
-  int n, a, b;
-  cin >> n;
-  adj = VVI(n + 1, VI());
-  cnt = VI(n + 1, 0);
-  ans = vector<LL>(n + 1, 0);
-  REP(i, n - 1){
+  int n, q, a, b;
+  cin >> n >> q;
+  adj = VI(n + 1, -1);
+  vis = VI(n + 1, 0);
+  REP(i, n){
+    cin >> a;
+    adj[i + 1] = a;
+  }
+  REP(i, q){
     cin >> a >> b;
-    adj[a].PB(b);
-    adj[b].PB(a);
+    cout << dfs(a, b) << '\n';
   }
-  dfs1(1, 0, 0);
-  dfs2(1, 0, n);
-  FOR(i, 1, n){
-    if (i > 1) cout << " ";
-    cout << ans[i];
-  }
-  cout << '\n';
 
   return 0;
 }

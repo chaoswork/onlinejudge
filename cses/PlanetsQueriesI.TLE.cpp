@@ -24,15 +24,16 @@
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
+#include <unordered_map>
 
 using namespace std;
 
 template<class T> inline void ckmax(T &a,T b){if(b>a) a=b;}
 
-
 #define MIN_HEAP(type1, type2) priority_queue<pair<type1, type2>, vector<pair<type1, type2> >, greater<pair<type1, type2> > >
 #define MAX_HEAP(type) priority_queue<type>
 #define ADJ(type1, type2) vector<pair<type1, type2> > 
+
 #define MP(A,B) make_pair(A,B)
 #define PB push_back
 #define SIZE(X) ((int)(X.size()))
@@ -62,54 +63,82 @@ const LL INF = 1LL<<62;  //std::numeric_limits<LL>::max();
 const int MAXN = 2e5 + 64;
 
 
-VVI adj;
-vector<LL> ans;
-vector<int> cnt;
+struct Graph{
+  int N;
+  vector<vector<int> > adj;
+  vector<unordered_map<int, int> > index;
+  VVI seqs;
+  VI prefix;
 
 
-void dfs1(int x, int par, int depth){
-  // cout << x << " " << par << " " << depth << endl;
-  cnt[x] = 1;
-  ans[1] += depth;
-  REP(i, SIZE(adj[x])){
 
-    int y = adj[x][i];
-    if (y == par) continue;
-
-    dfs1(y, x, depth + 1);
-    cnt[x] += cnt[y];
+  void init(int n){
+    N = n;
+    adj = vector<vector<int> >(n, vector<int>());
+    seqs = vector<vector<int> >(n, vector<int>());    
+    prefix = vector<int>(n, -1);
+    index = vector<unordered_map<int, int> > (n, unordered_map<int, int>());
+    
   }
-}
 
-void dfs2(int x, int par, int n){
-
-  REP(i, SIZE(adj[x])){
-    int y = adj[x][i];
-    if (y == par) continue;
-    ans[y] = ans[x] + n - 2 * cnt[y];
-    dfs2(y, x, n);
+  void add_edge(int a, int b){
+    adj[a].push_back(b);
   }
-}
+
+  int forward(int x, int k){
+    // cout << "iter " << x << " " << k << endl;
+    // DISP_VEC(seqs[x]);
+    // DISP_VEC(prefix);
+    if (prefix[x] != -1){
+      return seqs[x][prefix[x] + (k - prefix[x]) % (SIZE(seqs[x]) - prefix[x])];
+    }
+    if (k < SIZE(seqs[x])){
+      return seqs[x][k];
+    }
+
+    if (SIZE(seqs[x]) == 0){
+      seqs[x].PB(x);
+      index[x][x] = 0;
+    }
+    int kk = SIZE(seqs[x]) - 1;
+    int y = seqs[x][kk];
+    while (kk < k){
+      kk++;
+      y = adj[y][0];
+      if (index[x].find(y) != index[x].end()){
+        prefix[x] = index[x][y];
+        break;
+      }
+      seqs[x].PB(y);
+      
+    }
+    // DISP_VEC(seqs[x]);
+    // DISP_VEC(prefix);
+    if (prefix[x] != -1){
+      return seqs[x][prefix[x] + (k - prefix[x]) % (SIZE(seqs[x]) - prefix[x])];
+    }
+    return y;
+    
+  }
+
+
+};
 
 int main(){
   optimize;
-  int n, a, b;
-  cin >> n;
-  adj = VVI(n + 1, VI());
-  cnt = VI(n + 1, 0);
-  ans = vector<LL>(n + 1, 0);
-  REP(i, n - 1){
+  int n, m, a, b;
+  cin >> n >> m;
+  Graph g;
+  g.init(n);
+  REP(i, n){
+    cin >> a;
+    g.add_edge(i, a - 1);
+    // DISP_VEC(g.adj[i]);
+  }
+  REP(i, m){
     cin >> a >> b;
-    adj[a].PB(b);
-    adj[b].PB(a);
+    cout << g.forward(a - 1, b) + 1 << endl;
   }
-  dfs1(1, 0, 0);
-  dfs2(1, 0, n);
-  FOR(i, 1, n){
-    if (i > 1) cout << " ";
-    cout << ans[i];
-  }
-  cout << '\n';
 
   return 0;
 }

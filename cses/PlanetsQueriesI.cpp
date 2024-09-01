@@ -24,15 +24,16 @@
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
+#include <unordered_map>
 
 using namespace std;
 
 template<class T> inline void ckmax(T &a,T b){if(b>a) a=b;}
 
-
 #define MIN_HEAP(type1, type2) priority_queue<pair<type1, type2>, vector<pair<type1, type2> >, greater<pair<type1, type2> > >
 #define MAX_HEAP(type) priority_queue<type>
 #define ADJ(type1, type2) vector<pair<type1, type2> > 
+
 #define MP(A,B) make_pair(A,B)
 #define PB push_back
 #define SIZE(X) ((int)(X.size()))
@@ -62,54 +63,62 @@ const LL INF = 1LL<<62;  //std::numeric_limits<LL>::max();
 const int MAXN = 2e5 + 64;
 
 
-VVI adj;
-vector<LL> ans;
-vector<int> cnt;
+class JumpTree{
+private:
+  int N;
+  int powlen;
+  vector<int> par;
+  vector<vector<int> > jump_table;
+  
+public:
+  JumpTree(const vector<int> &parent, int max_k){
+    N = parent.size();
+    powlen = 0;
+    while ((1 << powlen) < max(N, max_k)) powlen++;
+    // powlen++;
+    // cout << powlen << endl;
+    jump_table = vector<vector<int> > (N, vector<int>(powlen, -1));
 
-
-void dfs1(int x, int par, int depth){
-  // cout << x << " " << par << " " << depth << endl;
-  cnt[x] = 1;
-  ans[1] += depth;
-  REP(i, SIZE(adj[x])){
-
-    int y = adj[x][i];
-    if (y == par) continue;
-
-    dfs1(y, x, depth + 1);
-    cnt[x] += cnt[y];
+    for (int i = 0; i < N; ++i) jump_table[i][0] = parent[i];
+    for (int p = 1; p < powlen; ++p){
+      for(int i = 0; i < N; ++i){
+        int halfway = jump_table[i][p - 1];
+        if (jump_table[halfway][p - 1] != -1)
+          jump_table[i][p] = jump_table[halfway][p - 1];
+      }
+    }
+      
   }
-}
 
-void dfs2(int x, int par, int n){
-
-  REP(i, SIZE(adj[x])){
-    int y = adj[x][i];
-    if (y == par) continue;
-    ans[y] = ans[x] + n - 2 * cnt[y];
-    dfs2(y, x, n);
+  int find_kth_parent(int x, int k){
+    int at = x;
+    for (int p = 0; p < powlen; ++p){
+      if (k & (1 << p)) at = jump_table[at][p];
+      if (at == -1) break;
+    }
+    return at;
   }
-}
+  
+};
+
 
 int main(){
   optimize;
-  int n, a, b;
-  cin >> n;
-  adj = VVI(n + 1, VI());
-  cnt = VI(n + 1, 0);
-  ans = vector<LL>(n + 1, 0);
-  REP(i, n - 1){
+  int n, m, a, b;
+  cin >> n >> m;
+
+  VI par(n, 0);
+  REP(i, n){
+    cin >> a;
+    // a is i's parent
+    par[i] = a - 1;
+    // DISP_VEC(g.adj[i]);
+  }
+  JumpTree tree(par, MOD);
+  REP(i, m){
     cin >> a >> b;
-    adj[a].PB(b);
-    adj[b].PB(a);
+    cout << tree.find_kth_parent(a - 1, b) + 1<< '\n';
   }
-  dfs1(1, 0, 0);
-  dfs2(1, 0, n);
-  FOR(i, 1, n){
-    if (i > 1) cout << " ";
-    cout << ans[i];
-  }
-  cout << '\n';
 
   return 0;
 }
