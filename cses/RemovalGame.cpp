@@ -62,8 +62,9 @@ vector<vector<LL> > ans = LMATRIX(5001, 5001, -INF);
 LL dp(int s, int e){
   if (ans[s][e] != -INF) return ans[s][e];
   if (s == e) return ans[s][e] = nums[s];
-
+  // 选择s，则剩余只能拿到对方最优解之后的得分。
   LL a = nums[s] + sum[s + 1][e] - dp(s + 1, e);
+  // 选择e，则剩余只能拿到对方最优解之后的得分。  
   LL b = nums[e] + sum[s][e - 1] - dp(s, e - 1);
 
   return ans[s][e] = max(a, b);

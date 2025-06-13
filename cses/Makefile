@@ -7,7 +7,7 @@ all:
 ifeq ($(NEWEST_CPP),)
 	@echo "No .cpp files found in the current directory."
 else
-	g++ $(NEWEST_CPP) --std=c++17 && cat test.in | ./a.out
+	g++-14 $(NEWEST_CPP) --std=c++17 && cat test.in | ./a.out
 endif
 
 # 清理生成的可执行文件

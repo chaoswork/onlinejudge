@@ -1,34 +1,10 @@
 #pragma GCC optimize("O3,unroll-loops,Ofast")
 #include<bits/stdc++.h>
 #include <ext/pb_ds/assoc_container.hpp>
-#include <vector>
-#include <list>
-#include <map>
-#include <set>
-#include <deque>
-#include <queue>
-#include <stack>
-#include <bitset>
-#include <algorithm>
-#include <functional>
-#include <numeric>
-#include <utility>
-#include <sstream>
-#include <iostream>
-#include <iomanip>
-#include <cstdio>
-#include <cmath>
-#include <cstdlib>
-#include <cctype>
-#include <string>
-#include <cstring>
-#include <cstdio>
-#include <cmath>
-#include <cstdlib>
-#include <ctime>
-
 using namespace __gnu_pbds;
 using namespace std;
+
+typedef tree<int,null_type,less<int>,rb_tree_tag, tree_order_statistics_node_update> indexed_set;
 template<class T> inline void ckmax(T &a,T b){if(b>a) a=b;}
 
 
@@ -66,6 +42,27 @@ const int MAXN = 2e5 + 64;
 
 int main(){
   optimize;
+  int n;
+  cin >> n;
+  LL f[int(1e6 + 10)];
+  LL g[int(1e6 + 10)];
+  // f(n) = (n - 1) * (f(n - 2) + (n - 2) * g(n - 2)
+  // g(n) = f(n - 1) + (n - 1) * g(n - 1)
+  // f(4) = 3 * (f(2) + 2 * g(2)) = 9
+  // f(2) = 1
+  // g(2) = 1
+  // f(3) = 2 * (f(1) + 1 * g(1)) = 2
+  // f(1) = 0
+  // g(1) = 1
+
+  f[1] = 0; f[2] = 1;
+  g[1] = 1; g[2] = 1;
+  FOR(i, 3, n){
+    f[i] = (i - 1) * ((f[i - 2] + (i - 2) * g[i - 2] % MOD) % MOD) % MOD;
+    g[i] = (f[i - 1] + (i - 1) * g[i - 1] % MOD) % MOD;
+  }
+  cout << f[n] << endl;
+
   
   return 0;
 }

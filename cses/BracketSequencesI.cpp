@@ -1,34 +1,10 @@
 #pragma GCC optimize("O3,unroll-loops,Ofast")
 #include<bits/stdc++.h>
 #include <ext/pb_ds/assoc_container.hpp>
-#include <vector>
-#include <list>
-#include <map>
-#include <set>
-#include <deque>
-#include <queue>
-#include <stack>
-#include <bitset>
-#include <algorithm>
-#include <functional>
-#include <numeric>
-#include <utility>
-#include <sstream>
-#include <iostream>
-#include <iomanip>
-#include <cstdio>
-#include <cmath>
-#include <cstdlib>
-#include <cctype>
-#include <string>
-#include <cstring>
-#include <cstdio>
-#include <cmath>
-#include <cstdlib>
-#include <ctime>
-
 using namespace __gnu_pbds;
 using namespace std;
+
+typedef tree<int,null_type,less<int>,rb_tree_tag, tree_order_statistics_node_update> indexed_set;
 template<class T> inline void ckmax(T &a,T b){if(b>a) a=b;}
 
 
@@ -63,9 +39,33 @@ const int MOD = 1000000007;
 const LL INF = 1LL<<62;  //std::numeric_limits<LL>::max();
 const int MAXN = 2e5 + 64;
 
-
+LL f[int(1e6 + 10)];
 int main(){
   optimize;
+  memset(f, 0, sizeof(f));
+  int n;
+  cin >> n;
+  if (n % 2){
+    cout << 0 << endl;
+  } else {
+    f[1] = 1;
+    /*
+    FOR(k, 4, n){
+      FOR(i, 1, n / 2 - 1){
+        f[k] += f[i * 2] * f[k - i * 2] % MOD;
+        f[k] %= MOD;
+      }
+      f[k] += f[k - 2];
+      f[k] %= MOD;
+    }
+    */
+    FOR(i, 2, n/2){
+      f[i] = 3 * (f[i - 1] - 1) + 2;
+      f[i] %= MOD;
+    }
+    
+    cout << f[n/2] << endl;
+  }
   
   return 0;
 }

@@ -78,45 +78,19 @@ public:
   
 };
 
-class Shrink{
-private:
-  vector<int> _values;
-public:
-  
-  Shrink(const vector<int> &values){
-    _values = values;
-    shrink();
-  }
-  size_t size(){
-    return _values.size();
-  }
-  void shrink(){
-    sort(_values.begin(), _values.end());
-    _values.erase(unique(_values.begin(), _values.end()), _values.end());
-  }
-  int id_map(int x){
-    return upper_bound(_values.begin(), _values.end(), x) - _values.begin();
-  }  
-};
-
-
-
-
 int main(){
   int n, m, k, x, a, b;
   char c;
   cin >> n >> m;
   VI nums;
-  VI shrink;  
-  // set<int> shrink;
-
+  set<int> shrink;
 
   vector<char> cmds;
   vector<PII> args;
   REP(i, n){
     cin >> x;
     nums.PB(x);
-    shrink.PB(x);
+    shrink.insert(x);
     // bit.update(x, 1);
   }
   // cout << bit.query(2) << endl;
@@ -129,33 +103,32 @@ int main(){
       // bit.update(x, 1);
       cmds.PB(c);
       args.PB(MP(k, x));
-      shrink.PB(x);
+      shrink.insert(x);
       
     } else {
       cin >> a >> b;
       cmds.PB(c);
       args.PB(MP(a, b));
-      shrink.PB(a);
-      shrink.PB(b);
+      shrink.insert(a);
+      shrink.insert(b);
       // cout << bit.query(b) - bit.query(a - 1) << endl;
     }
   }
-  /*
+
   unordered_map<int, int> id_map;
   id_map.reserve(10240);
   id_map.max_load_factor(0.25);
   
   int start = 1;
   for(int e: shrink) id_map[e] = start++;
-
+  /*
   for(auto e: id_map){
     cout << e.first << " " << e.second << endl;
   }
   */
-  Shrink sk(shrink);
-  BIT bit = BIT(sk.size() + 10);
+  BIT bit = BIT(start + 10);
   REP(i, n){
-    bit.update(sk.id_map(nums[i]), 1);    
+     bit.update(id_map[nums[i]], 1);    
   }
 
 
@@ -163,13 +136,13 @@ int main(){
     if (cmds[i] == '!'){
       k = args[i].first;
       x = args[i].second;
-      bit.update(sk.id_map(nums[k - 1]), -1);
+      bit.update(id_map[nums[k - 1]], -1);
       nums[k - 1] = x;
-      bit.update(sk.id_map(x), 1);
+      bit.update(id_map[x], 1);
     } else {
       a = args[i].first;
       b = args[i].second;
-      cout << bit.query(sk.id_map(b)) - bit.query(sk.id_map(a) - 1) << '\n';      
+      cout << bit.query(id_map[b]) - bit.query(id_map[a] - 1) << '\n';      
     }
 
   }

@@ -48,37 +48,30 @@ typedef vector<double> VD;
 typedef long long LL;
 typedef pair<int, int> PII;
 
-LL MOD = 1000000007;
-
-int N = 7;
-int cnt = 0;
-
-string path;
-vector<char> search = vector<char> (50, 0);
-VVI vis = MATRIX(7, 7, 0);
-int dirx[4] = {-1, 0, 0, 1};
-int diry[4] = {0, -1, 1, 0};
-
-void dfs(int x, int y, int cur){
-  if (x < 0 || x >= N || y < 0 || y >= N) return;
-  if (vis[x][y]) return;
-  if (cur == N * N - 1) {
-    if (x == N - 1 && y == 0){
-      cnt += 1;
-    }
-    return;
-  }
-  REP(i, 4){
-    vis[x][y] = 1;
-    dfs(x + dirx[i], y + diry[i], cur + 1);
-    vis[x][y] = 0;
-  }
-}
 int main(){
-  // DLRU
-
-  cin >> path;
-  dfs(0, 0, 0);
-  cout << cnt << endl;
+  int n, m, k, x, a, b;
+  char c;
+  cin >> n >> m;
+  VI nums;
+  multiset<int> S;
+  REP(i, n){
+    cin >> x;
+    nums.PB(x);
+    S.insert(x);
+  }
+  REP(i, m){
+    cin >> c;
+    if (c == '!'){
+      cin >> k >> x;
+      S.erase(S.find(nums[k - 1]));
+      S.insert(x);
+      nums[k - 1] = x;
+    } else {
+      cin >> a >> b;
+      int n = distance(S.lower_bound(a), S.upper_bound(b));
+      cout << n << endl;
+    }
+  }
+  
   return 0;
 }

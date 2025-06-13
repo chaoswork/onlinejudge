@@ -1,6 +1,4 @@
 #pragma GCC optimize("O3,unroll-loops,Ofast")
-#include<bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
 #include <vector>
 #include <list>
 #include <map>
@@ -27,14 +25,14 @@
 #include <cstdlib>
 #include <ctime>
 
-using namespace __gnu_pbds;
 using namespace std;
-template<class T> inline void ckmax(T &a,T b){if(b>a) a=b;}
 
+template<class T> inline void ckmax(T &a,T b){if(b>a) a=b;}
 
 #define MIN_HEAP(type1, type2) priority_queue<pair<type1, type2>, vector<pair<type1, type2> >, greater<pair<type1, type2> > >
 #define MAX_HEAP(type) priority_queue<type>
 #define ADJ(type1, type2) vector<pair<type1, type2> > 
+
 #define MP(A,B) make_pair(A,B)
 #define PB push_back
 #define SIZE(X) ((int)(X.size()))
@@ -66,6 +64,31 @@ const int MAXN = 2e5 + 64;
 
 int main(){
   optimize;
-  
+  int n, a, b, x;
+  cin >> n >> a >> b;
+  vector<LL> prefix(n + 1, 0);
+  FOR(i, 1, n){
+    cin >> x;
+    prefix[i] = prefix[i - 1] + x;
+  }
+  multiset<LL> window;
+  LL ans = -INF;
+  FOR(i, 1, n){
+    //                  i
+    // i-b,..,    i-a
+    //         5
+    // 1 2 3
+
+    if (i - a >= 0){
+      window.insert(prefix[i - a]);
+    }
+    if (SIZE(window) > b - a + 1){
+      window.erase(window.find(prefix[i - b - 1]));
+    }
+    if (SIZE(window)){
+      ans = max(ans, prefix[i] - *window.begin());
+    }
+  }
+  cout << ans << endl;
   return 0;
 }

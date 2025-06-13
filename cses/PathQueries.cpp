@@ -1,6 +1,4 @@
 #pragma GCC optimize("O3,unroll-loops,Ofast")
-#include<bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
 #include <vector>
 #include <list>
 #include <map>
@@ -27,8 +25,8 @@
 #include <cstdlib>
 #include <ctime>
 
-using namespace __gnu_pbds;
 using namespace std;
+
 template<class T> inline void ckmax(T &a,T b){if(b>a) a=b;}
 
 
@@ -63,9 +61,92 @@ const int MOD = 1000000007;
 const LL INF = 1LL<<62;  //std::numeric_limits<LL>::max();
 const int MAXN = 2e5 + 64;
 
+class BIT{
+private:
+  LL maxv;
+  vector<LL> values;
+public:
+  BIT(LL _maxv){
+    maxv = _maxv;
+    values = vector<LL> (maxv, 0);
+  }
+
+  void update(LL x, LL v){
+    while(x <= maxv){
+      values[x] += v;
+      x += (x & -x);
+    }
+  }
+
+  LL query(int x){
+    LL res = 0;
+    while (x > 0){
+      res += values[x];
+      x -= (x & -x);
+    }
+    return res;
+  }
+  
+};
+
+int timer = 0;
+VI start;
+VI finish;
+VVI adj;
+void dfs(int x, int p){
+  start[x] = ++timer;
+  for(auto y: adj[x]){
+    if (y == p) continue;
+    dfs(y, x);
+  }
+  finish[x] = ++timer;
+}
 
 int main(){
   optimize;
-  
+  int n, q, x, a, b;
+  cin >> n >> q;
+  BIT bit = BIT(n * 2 + 10);
+  start = VI(n + 1, 0);
+  finish = VI(n + 1, 0);
+  adj = VVI(n + 1, VI());
+  VI values;
+  values.PB(0);
+  FOR(i, 1, n){
+    cin >> x;
+    values.PB(x);
+  }
+  REPN(n - 1){
+    cin >> a >> b;
+    adj[a].PB(b);
+    adj[b].PB(a);
+  }
+  dfs(1, 0);
+  // DISP_VEC(start);
+  // nDISP_VEC(finish);
+  // DISP_VEC(values);
+  FOR(i, 1, n){
+    bit.update(start[i], values[i]);
+    bit.update(finish[i], -values[i]);
+  }
+  /*
+  FOR(i, 1, n * 2){
+    cout << bit.query(i) << endl;
+    }*/
+  REPN(q){
+    cin >> x;
+    if (x == 1){
+      cin >> a >> b;
+      LL diff = b - values[a];
+      values[a] = b;
+      bit.update(start[a], diff);
+      bit.update(finish[a], -diff);
+    } else {
+      cin >> a;
+      // cout << bit.query(finish[a] - 1) << endl; // TODO start[a] - 1 ?
+      cout << bit.query(start[a]) << endl; // TODO start[a] - 1 ?      
+    }
+    
+  }
   return 0;
 }

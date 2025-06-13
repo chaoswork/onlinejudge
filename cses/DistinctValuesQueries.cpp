@@ -1,6 +1,4 @@
 #pragma GCC optimize("O3,unroll-loops,Ofast")
-#include<bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
 #include <vector>
 #include <list>
 #include <map>
@@ -27,8 +25,8 @@
 #include <cstdlib>
 #include <ctime>
 
-using namespace __gnu_pbds;
 using namespace std;
+
 template<class T> inline void ckmax(T &a,T b){if(b>a) a=b;}
 
 
@@ -63,9 +61,74 @@ const int MOD = 1000000007;
 const LL INF = 1LL<<62;  //std::numeric_limits<LL>::max();
 const int MAXN = 2e5 + 64;
 
+class BIT{
+private:
+  LL maxv;
+  vector<int> values;
+public:
+  BIT(LL _maxv){
+    maxv = _maxv;
+    values = vector<int> (maxv, 0);
+  }
+
+  void update(LL x, int v){
+    while(x <= maxv){
+      values[x] += v;
+      x += (x & -x);
+    }
+  }
+
+  int query(int x){
+    int res = 0;
+    while (x > 0){
+      res += values[x];
+      x -= (x & -x);
+    }
+    return res;
+  }
+  
+};
+
 
 int main(){
   optimize;
+  int n, q, x, a, b;
+  cin >> n >> q;
+  BIT bit = BIT(2e5 + 10);
+  VI nums;
+  VI ans(q + 1, -1);
+  vector<vector<PII> > queries = vector<vector<PII> >(n + 1, vector<PII>());
+  FOR(i, 1, n){
+    cin >> x;
+    nums.PB(x);
+  }
+  REP(i, q){
+    cin >> a >> b;
+    queries[a].PB(MP(b, i));
+  }
+  map<int, int> last_index;
+  FORD(i, n, 1){
+    int v = nums[i - 1];
+    if (last_index.find(v) != last_index.end()){
+      bit.update(last_index[v], -1);
+    }
+    last_index[v] = i;
+    bit.update(last_index[v], 1);
+
+    REP(j, SIZE(queries[i])){
+      b = queries[i][j].first;
+      int index = queries[i][j].second;
+      ans[index] = bit.query(b);
+      
+    }
+  }
+  // DISP_VEC(ans);
   
+  REP(i, q){
+    cout << ans[i] << endl;
+  }
+
+
+
   return 0;
 }

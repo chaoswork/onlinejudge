@@ -1,6 +1,4 @@
 #pragma GCC optimize("O3,unroll-loops,Ofast")
-#include<bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
 #include <vector>
 #include <list>
 #include <map>
@@ -27,8 +25,8 @@
 #include <cstdlib>
 #include <ctime>
 
-using namespace __gnu_pbds;
 using namespace std;
+
 template<class T> inline void ckmax(T &a,T b){if(b>a) a=b;}
 
 
@@ -63,9 +61,68 @@ const int MOD = 1000000007;
 const LL INF = 1LL<<62;  //std::numeric_limits<LL>::max();
 const int MAXN = 2e5 + 64;
 
+class BIT{
+private:
+  LL maxv;
+  vector<int> values;
+public:
+  BIT(LL _maxv){
+    maxv = _maxv;
+    values = vector<int> (maxv, 0);
+  }
+
+  void update(LL x, int v){
+    while(x <= maxv){
+      values[x] += v;
+      x += (x & -x);
+    }
+  }
+
+  int query(int x){
+    int res = 0;
+    while (x > 0){
+      res += values[x];
+      x -= (x & -x);
+    }
+    return res;
+  }
+  
+};
+
 
 int main(){
   optimize;
-  
+  int n, q, x, a, b;
+  cin >> n >> q;
+  map<int, int> start;
+  map<int, int> end;
+
+  BIT sbit = BIT(2e5 + 10);
+  BIT ebit = BIT(2e5 + 10);  
+
+  FOR(i, 1, n){
+    cin >> x;
+    if (start.find(x) == start.end()){
+      start[x] = i;
+    }
+    end[x] = i;
+  }
+
+
+  for (auto x: start){
+    sbit.update(x.second, 1);
+    ebit.update(end[x.first], 1);
+  }
+  FOR(i, 1, 10){
+    cout << i << " " << start[i] << " " << end[i] << endl;
+  }
+
+  cout << ebit.query(87 - 1) << endl;
+  cout << sbit.query(93) << endl;  
+
+  REPN(q){
+    cin >> a >> b;
+    cout << sbit.query(b) - ebit.query(a - 1) << endl;
+  }
   return 0;
 }

@@ -1,6 +1,4 @@
 #pragma GCC optimize("O3,unroll-loops,Ofast")
-#include<bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
 #include <vector>
 #include <list>
 #include <map>
@@ -27,8 +25,8 @@
 #include <cstdlib>
 #include <ctime>
 
-using namespace __gnu_pbds;
 using namespace std;
+
 template<class T> inline void ckmax(T &a,T b){if(b>a) a=b;}
 
 
@@ -63,9 +61,85 @@ const int MOD = 1000000007;
 const LL INF = 1LL<<62;  //std::numeric_limits<LL>::max();
 const int MAXN = 2e5 + 64;
 
+struct node{
+  vector<node *> childs;
+  LL value;
+  LL sum;
+  int id;
+  node(int _id, int v):id(_id), sum(v), value(v){}
+};
+VI parent;
+VI values;
+VVI adj;
+vector<node *> p_nodes;
+
+node * build_tree(int cur, int p){
+  node *root = new node(cur, values[cur]);
+  REP(i, SIZE(adj[cur])){
+    int j = adj[cur][i];
+    if (j == p) continue;
+    parent[j] = cur;
+    node *child = build_tree(j, cur);
+    root->childs.PB(child);
+    root->sum += child->sum;
+  }
+  p_nodes[cur] = root;
+
+  return root;
+}
+
+void update(int cur, int value){
+  LL diff = value - p_nodes[cur]->value;
+  p_nodes[cur]->value = value;
+
+  while (cur){
+    node *root = p_nodes[cur];
+    root->sum += diff;
+    cur = parent[cur];
+  }
+}
+
+LL query(int cur){
+  return p_nodes[cur]->sum;
+}
+
+void display(int n){
+  FOR(i, 1, n){
+    cout << i << " " << p_nodes[i]->value << " " << p_nodes[i]->sum << endl;
+  }
+  cout << "---" << endl;
+}
+
 
 int main(){
   optimize;
-  
+  int n, q, x, a, b;
+  cin >> n >> q;
+
+  adj = VVI(n + 1, VI());
+  parent = VI(n + 1, 0);
+  p_nodes = vector<node *>(n + 1, 0);
+  values.PB(0);
+  REPN(n){
+    cin >> x;
+    values.PB(x);
+  }
+  REPN(n - 1){
+    cin >> a >> b;
+    adj[a].PB(b);
+    adj[b].PB(a);
+  }
+  build_tree(1, 0);
+  REPN(q){
+    cin >> a;
+    if (a == 1){
+      cin >> x >> b;
+      update(x, b);
+      // display(n);
+    } else{
+      cin >> x;
+      cout << query(x) << endl;
+    }
+  }
   return 0;
 }

@@ -1,6 +1,4 @@
 #pragma GCC optimize("O3,unroll-loops,Ofast")
-#include<bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
 #include <vector>
 #include <list>
 #include <map>
@@ -27,8 +25,8 @@
 #include <cstdlib>
 #include <ctime>
 
-using namespace __gnu_pbds;
 using namespace std;
+
 template<class T> inline void ckmax(T &a,T b){if(b>a) a=b;}
 
 
@@ -64,8 +62,87 @@ const LL INF = 1LL<<62;  //std::numeric_limits<LL>::max();
 const int MAXN = 2e5 + 64;
 
 
+class BIT{
+private:
+  LL maxv;
+  vector<LL> values;
+public:
+  BIT(LL _maxv){
+    maxv = _maxv;
+    values = vector<LL> (maxv, 0);
+  }
+
+  void update(LL x, int v){
+    while(x <= maxv){
+      values[x] += v;
+      x += (x & -x);
+    }
+  }
+
+  LL query(int x){
+    LL res = 0;
+    while (x > 0){
+      res += values[x];
+      x -= (x & -x);
+    }
+    return res;
+  }
+  
+};
+
+
+VVI adj;
+VI values;
+VI start;
+VI finish;
+int timer = 0;
+
+void dfs(int x, int p){
+  start[x] = ++timer;
+  for(auto j: adj[x]){
+    if (j == p) continue;
+    dfs(j, x);
+  }
+  finish[x] = timer;
+}
+
 int main(){
   optimize;
+  int n, q, x, a, b;
+  cin >> n >> q;
+
+  adj = VVI(n + 1, VI());
+  start = VI(n + 1, 0);
+  finish = VI(n + 1, 0);
+  values.PB(0);
+  REPN(n){
+    cin >> x;
+    values.PB(x);
+  }
+  REPN(n - 1){
+    cin >> a >> b;
+    adj[a].PB(b);
+    adj[b].PB(a);
+  }
+  dfs(1, 0);
+  BIT bit = BIT(timer + 10);
+  FOR(i, 1, n){
+    bit.update(start[i], values[i]);
+  }
   
+
+  REPN(q){
+    cin >> a;
+    if (a == 1){
+      cin >> x >> b;
+      bit.update(start[x], b - values[x]);
+      values[x] = b;
+      
+      // display(n);
+    } else{
+      cin >> x;
+      cout << bit.query(finish[x]) - bit.query(start[x] - 1) << endl;
+    }
+  }
   return 0;
 }

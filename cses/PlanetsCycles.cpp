@@ -1,6 +1,4 @@
 #pragma GCC optimize("O3,unroll-loops,Ofast")
-#include<bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
 #include <vector>
 #include <list>
 #include <map>
@@ -27,8 +25,8 @@
 #include <cstdlib>
 #include <ctime>
 
-using namespace __gnu_pbds;
 using namespace std;
+
 template<class T> inline void ckmax(T &a,T b){if(b>a) a=b;}
 
 
@@ -63,9 +61,56 @@ const int MOD = 1000000007;
 const LL INF = 1LL<<62;  //std::numeric_limits<LL>::max();
 const int MAXN = 2e5 + 64;
 
+int n;
+int to[MAXN];
+int ans[MAXN];
+int ts[MAXN];
+int timer;
+
+void dfs(int x){
+  // cout << "enter: " << x << endl;
+  if (to[x] == x) {
+    ans[x] = 1;
+    return;
+  }
+  ts[x] = timer++;
+  if (ans[to[x]]){
+    ans[x] = ans[to[x]] + 1;
+  } else if (ts[to[x]] && ts[to[x]] < ts[x]){
+    int cur = to[x];
+    while (1){
+      ans[cur] = ts[x] - ts[to[x]] + 1;
+      cur = to[cur];
+      if (cur == to[x]) break;
+    }
+    
+  } else {
+    dfs(to[x]);
+  }
+  if (ans[x]) return;
+  ans[x] = ans[to[x]] + 1;
+    
+}
 
 int main(){
   optimize;
-  
+  memset(ans, 0, sizeof(ans));
+
+  cin >> n;
+  int t;
+  FOR(i, 1, n){
+    cin >> t;
+    to[i] = t;
+  }
+  FOR(i, 1, n){
+    if (ans[i]) continue;
+    dfs(i);
+  }
+
+  FOR(i, 1, n){
+    if(i > 1) cout << " ";
+    cout << ans[i];
+  }
+  cout << endl;
   return 0;
 }

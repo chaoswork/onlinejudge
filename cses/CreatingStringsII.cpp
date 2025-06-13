@@ -1,6 +1,4 @@
 #pragma GCC optimize("O3,unroll-loops,Ofast")
-#include<bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
 #include <vector>
 #include <list>
 #include <map>
@@ -27,8 +25,8 @@
 #include <cstdlib>
 #include <ctime>
 
-using namespace __gnu_pbds;
 using namespace std;
+
 template<class T> inline void ckmax(T &a,T b){if(b>a) a=b;}
 
 
@@ -61,11 +59,54 @@ typedef pair<int, int> PII;
 
 const int MOD = 1000000007;
 const LL INF = 1LL<<62;  //std::numeric_limits<LL>::max();
-const int MAXN = 2e5 + 64;
+const int MAXN = 1e6 + 64;
+
+LL fac[MAXN];
+LL inv[MAXN];
+
+LL exp_mod(LL x, LL n, LL mod){
+
+  LL res = 1;
+  LL base = x;
+  while (n){
+    if (n & 1) res = res * base % mod;
+    base = base * base % mod;    
+    n >>= 1;
+  }
+  return res;
+  
+}
+
+LL Cnm_mod(LL n, LL m, LL mod){
+  return (fac[n] * inv[n - m] % mod) * inv[m] % mod;
+}
 
 
 int main(){
   optimize;
-  
+  string line;
+  fac[0] = 1;
+  FOR(i, 1, MAXN - 1){
+    fac[i] = fac[i - 1] * i % MOD;
+  }
+  inv[MAXN - 1] = exp_mod(fac[MAXN - 1], MOD - 2, MOD);
+  FORD(i, MAXN - 2, 0) inv[i] = (i + 1) * inv[i + 1] % MOD;
+  // cout << exp_mod(2, 16, MOD) << endl;
+  cin >> line;
+  map<char, int> cnt;
+  LL n = SIZE(line);  
+  REP(i, SIZE(line)){
+    if (cnt.find(line[i]) == cnt.end()) cnt[line[i]] = 0;
+    cnt[line[i]]++;
+  }
+
+  LL ans = 1;
+  for (auto e: cnt){
+    // cout << n << " " << e.second << endl;
+    ans *= Cnm_mod(n, e.second, MOD);
+    ans %= MOD;
+    n -= e.second;
+  }
+  cout << ans << endl;
   return 0;
 }

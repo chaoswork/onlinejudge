@@ -1,6 +1,4 @@
 #pragma GCC optimize("O3,unroll-loops,Ofast")
-#include<bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
 #include <vector>
 #include <list>
 #include <map>
@@ -27,8 +25,8 @@
 #include <cstdlib>
 #include <ctime>
 
-using namespace __gnu_pbds;
 using namespace std;
+
 template<class T> inline void ckmax(T &a,T b){if(b>a) a=b;}
 
 
@@ -66,6 +64,18 @@ const int MAXN = 2e5 + 64;
 
 int main(){
   optimize;
-  
+  int n, x;
+  cin >> n;
+  vector<LL> nums;
+  REP(i, n){
+    cin >> x;
+    nums.PB(x);
+  }
+  sort(ALL(nums));
+  LL ans = 0;
+  REP(i, n / 2){
+    ans += nums[n - 1 - i] - nums[i];
+  }
+  cout << ans << endl;
   return 0;
 }

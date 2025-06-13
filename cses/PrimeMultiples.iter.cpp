@@ -1,34 +1,10 @@
 #pragma GCC optimize("O3,unroll-loops,Ofast")
 #include<bits/stdc++.h>
 #include <ext/pb_ds/assoc_container.hpp>
-#include <vector>
-#include <list>
-#include <map>
-#include <set>
-#include <deque>
-#include <queue>
-#include <stack>
-#include <bitset>
-#include <algorithm>
-#include <functional>
-#include <numeric>
-#include <utility>
-#include <sstream>
-#include <iostream>
-#include <iomanip>
-#include <cstdio>
-#include <cmath>
-#include <cstdlib>
-#include <cctype>
-#include <string>
-#include <cstring>
-#include <cstdio>
-#include <cmath>
-#include <cstdlib>
-#include <ctime>
-
 using namespace __gnu_pbds;
 using namespace std;
+
+typedef tree<int,null_type,less<int>,rb_tree_tag, tree_order_statistics_node_update> indexed_set;
 template<class T> inline void ckmax(T &a,T b){if(b>a) a=b;}
 
 
@@ -63,9 +39,76 @@ const int MOD = 1000000007;
 const LL INF = 1LL<<62;  //std::numeric_limits<LL>::max();
 const int MAXN = 2e5 + 64;
 
+LL n;
+LL ans = 0;
+vector<LL> nums;
+vector<LL> buff;
+void dfs(LL start){
+
+  if (start == SIZE(nums)){
+    DISP_VEC(buff);
+    LL cur = 0;
+    LL d = 1;
+    REP(i, SIZE(buff)) {
+      d *=buff[i];
+      if (d < 0 || d > n) return;
+    }
+    if (d < 0 || d > n) return;
+    cur = n / d;
+    cout << "cur = " <<  cur << " d = " << d << endl;
+    if (SIZE(buff) % 2 == 0) ans -= cur;
+    else ans += cur;
+      
+    
+    return;
+  }
+
+  FOR(i, start + 1, SIZE(nums)){
+    buff.PB(nums[start]);    
+    dfs(i);
+    buff.pop_back();
+  }
+
+}
+
+
 
 int main(){
   optimize;
-  
+  LL k, x;
+  cin >> n >> k;
+
+  REP(i, k){
+    cin >> x;
+    nums.PB(x);
+  }
+  double nlog = log(n);
+  for (LL i = 1; i < (1 << k); i++) {
+    vector<LL> combination;
+    for (LL j = 0; j < k; j++) {
+      if (i & (1 << j)) {
+        combination.push_back(nums[j]);
+      }
+    }
+    LL d = 1;
+    double xlog = 0;
+    // DISP_VEC(combination);
+    REP(i, SIZE(combination)) {
+      // if (double(n) / double(d) < double(combination[i])) break;      
+      d *= combination[i];
+      xlog += log(combination[i]);
+
+    }
+    // if (double(n) / double(d) < double(combination[i])) continue;
+    if (xlog > nlog) continue;
+    LL cur = n / d;
+    // cout << "cur = " <<  cur << " d = " << d << endl;
+    if (SIZE(combination) % 2 == 0) ans -= cur;
+    else ans += cur;
+
+  }
+    
+
+  cout << ans << endl;
   return 0;
 }
